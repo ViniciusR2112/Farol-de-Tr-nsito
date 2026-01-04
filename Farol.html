@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinalizador de Metrô</title>
+    <style>
+        :root {
+            --cor-fundo: #1a1a1a;
+            --cor-corpo: #333;
+            --off-light: #222;
+            --vermelho: #ff3b3b;
+            --amarelo: #ffcc00;
+            --verde: #00e676;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        /* Estrutura do Semáforo */
+        .semaforo {
+            width: 120px;
+            background-color: var(--cor-corpo);
+            padding: 20px;
+            border-radius: 60px;
+            box-shadow: 10px 10px 0px #222;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Cada Luz */
+        .luz {
+            width: 80px;
+            height: 80px;
+            background-color: var(--off-light);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        /* Viseira (o 'chapéu' de cada luz) */
+        .luz::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            height: 40px;
+            background: #222;
+            border-radius: 40px 40px 0 0;
+            z-index: -1;
+        }
+
+        /* Classes de Ativação */
+        .luz.vermelho.active {
+            background-color: var(--vermelho);
+            box-shadow: 0 0 40px var(--vermelho);
+        }
+
+        .luz.amarelo.active {
+            background-color: var(--amarelo);
+            box-shadow: 0 0 40px var(--amarelo);
+        }
+
+        .luz.verde.active {
+            background-color: var(--verde);
+            box-shadow: 0 0 40px var(--verde);
+        }
+
+        /* Controles */
+        .controles {
+            margin-left: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            background: #002D62;
+            color: white;
+        }
+
+        button:hover { background: #00408a; }
+    </style>
+</head>
+<body>
+
+    <div class="semaforo">
+        <div class="luz vermelho" id="luz-vermelha"></div>
+        <div class="luz amarelo" id="luz-amarela"></div>
+        <div class="luz verde" id="luz-verde"></div>
+    </div>
+
+    <div class="controles">
+        <button onclick="mudarLuz('vermelho')">PARE (1)</button>
+        <button onclick="mudarLuz('amarelo')">ATENÇÃO (2)</button>
+        <button onclick="mudarLuz('verde')">SIGA (3)</button>
+        <hr>
+        <button onclick="iniciarAutomatico()" id="btnAuto">MODO AUTOMÁTICO</button>
+    </div>
+
+    <script>
+        function mudarLuz(cor) {
+            // Desliga todas as luzes
+            document.querySelectorAll('.luz').forEach(l => l.classList.remove('active'));
+            
+            // Liga a luz selecionada
+            if(cor === 'vermelho') document.getElementById('luz-vermelha').classList.add('active');
+            if(cor === 'amarelo') document.getElementById('luz-amarela').classList.add('active');
+            if(cor === 'verde') document.getElementById('luz-verde').classList.add('active');
+        }
+
+        // Lógica para alternar automaticamente
+        let autoInterval;
+        function iniciarAutomatico() {
+            if (autoInterval) {
+                clearInterval(autoInterval);
+                autoInterval = null;
+                document.getElementById('btnAuto').innerText = "MODO AUTOMÁTICO";
+                return;
+            }
+
+            document.getElementById('btnAuto').innerText = "PARAR AUTOMÁTICO";
+            let estado = 0; // 0: Verde, 1: Amarelo, 2: Vermelho
+            
+            const sequencia = () => {
+                const fases = ['verde', 'amarelo', 'vermelho'];
+                mudarLuz(fases[estado]);
+                estado = (estado + 1) % fases.length;
+            };
+
+            sequencia();
+            autoInterval = setInterval(sequencia, 2000);
+        }
+    </script>
+</body>
+</html>
